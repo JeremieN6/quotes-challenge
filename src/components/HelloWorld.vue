@@ -1,33 +1,33 @@
 <template>
-  <!-- <div class="hello">
+   <!--<div class="hello">
     <div v-for="item in quotes" v-bind:key="item._id" >
       <p style="color: blue;">{{item.content}}</p>
       <span style="color: red;">{{ item.author }}</span>
       </div>
   </div> -->
-          <div class="myheader">
-            <div class="random" v-on:click="newQuote">
-                {{refresh_quote}}
-                <i class="fa fa-refresh" aria-hidden="true"></i>
-            </div>
+  <div class="myheader">
+        <div class="random" v-on:click="newQuote">
+            {{refresh_quote}}
+            <i class="fa fa-refresh" aria-hidden="true"></i>
         </div>
-        <div class="container_page" v-for="item in quotes" v-bind:key="item._id" >                
-            <div class="author" id="containerAuthor" v-show="false">
-                {{item.author}}
-            </div>
-            <div class="container_quotes">
-                <div class="quote">
-                    "{{item.content}}"
-                </div>
-                <div class="container_author_genre" id="container_author_genre" v-on:click="test">
-                    <div class="author_genre" v-for="item in quotes" v-bind:key="item.tags">
-                        <div class="theAuthor">{{item.author}}</div>
-                        <div class="genre">{{item.tags}}</div>
-                    </div>
-                    <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                </div>
-            </div>    
+    </div>
+    <div class="container_page">   <!--v-for="item in quotes" v-bind:key="item.content" -->              
+        <div class="author" id="containerAuthor" v-show="true">
+            {{currentQuote.author}}
         </div>
+        <div class="container_quotes">
+            <div class="quote">
+                "{{currentQuote.content}}"
+            </div>
+            <div class="container_author_genre" id="container_author_genre" v-on:click="test">
+                <div class="author_genre"> <!--v-for="item in quotes" v-bind:key="item.content" --> 
+                    <div class="theAuthor">{{currentQuote.author}}</div>
+                    <div class="genre" v-html="currentQuote.tags"></div>
+                </div>
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+            </div>
+        </div>    
+    </div>
 </template>
 
 <script>
@@ -36,16 +36,24 @@ export default {
   name: 'HelloWorld',
   data(){
     return{
-      quotes: null,
-      refresh_quote:"random",
+        quotes: null,
+        currentQuote: {},
+        authorQuote: {},
+        tag: null,
+        refresh_quote:"random",
     }
+  },
+  async created() {
+    const response = await fetch('https://api.quotable.io/random');
+    const data = await response.json();
+    this.currentQuote = data;
   },
     methods:{
       test: function(){
           var container_author_genre = document.getElementById("container_author_genre");
           var containerAuthor = document.getElementById("containerAuthor");
 
-          container_author_genre.style.visibility = "none";
+          container_author_genre.style.display = "none";
           containerAuthor.style.display = "flex";
       },
       newQuote: function(){
@@ -57,6 +65,7 @@ export default {
     .get("https://api.quotable.io/random")
     .then((reponse) => {
       this.quotes = reponse;
+      this.tags = reponse.data.tags;
       console.log(this.quotes);
     })
   }
@@ -88,6 +97,7 @@ export default {
 .container_page{
     position: absolute;
     top: 30%;
+    width: 100%;
 }
 .author{
     display: none;
@@ -160,7 +170,7 @@ footer{
     justify-content: center;
     position: absolute;
     bottom: 0;
-    right: 30%;
+    left: 20%;
 }
 @media (min-width:768px){
     .quote {
